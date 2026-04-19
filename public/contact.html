@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contacta con MallorcaEasyStay. Preguntas, colaboraciones y alianzas locales para turismo sostenible en Mallorca.">
+  <title>MallorcaEasyStay | Contacto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Leaflet for mini map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    .contact-hero {
+      margin-top: 72px;
+      padding: var(--spacing-16) 0 var(--spacing-8);
+      background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface) 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,95,115,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .contact-hero h1 {
+      color: var(--primary);
+      animation: fadeInUp 0.8s ease both;
+    }
+    .contact-hero p {
+      animation: fadeInUp 0.8s ease 0.15s both;
+      max-width: 550px;
+      margin: 1rem auto 0;
+      font-size: 1.15rem;
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-8);
+      align-items: flex-start;
+    }
+
+    /* Contact Info Side */
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .info-card {
+      background: var(--surface-container-lowest);
+      padding: var(--spacing-4);
+      border-radius: var(--rounded-xl);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: transform 0.3s;
+    }
+    .info-card:hover { transform: translateY(-3px); }
+    .info-icon {
+      width: 48px; height: 48px;
+      background: var(--surface-container-low);
+      border-radius: var(--rounded-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .info-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+    .info-card p {
+      font-size: 0.9rem;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Mini Map */
+    .contact-map {
+      width: 100%;
+      height: 220px;
+      border-radius: var(--rounded-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Social Links */
+    .social-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .social-link {
+      width: 44px; height: 44px;
+      border-radius: var(--rounded-lg);
+      background: var(--surface-container-low);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .social-link:hover {
+      background: var(--primary);
+      color: var(--on-primary);
+      transform: translateY(-3px);
+    }
+
+    /* Contact Form */
+    .contact-form {
+      background: var(--surface-container-lowest);
+      padding: var(--spacing-8);
+      border-radius: var(--rounded-xl);
+      box-shadow: var(--shadow-elevated);
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-form::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary-container), var(--primary));
+      background-size: 200% 100%;
+    }
+    .contact-form h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    .contact-form > p {
+      margin-bottom: var(--spacing-6);
+      font-size: 0.95rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-group .validation-msg {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: none;
+      font-weight: 500;
+    }
+    .form-group .validation-msg.error {
+      color: var(--error);
+      display: block;
+    }
+    .form-group .validation-msg.valid {
+      color: var(--success);
+      display: block;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn .btn-text { transition: opacity 0.3s; }
+    .submit-btn .btn-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .submit-btn.loading .btn-text { opacity: 0; }
+    .submit-btn.loading .btn-loader { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .contact-layout {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-6);
+      }
+      .contact-form { padding: var(--spacing-6); }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-hero { padding: var(--spacing-12) 0 var(--spacing-6); }
+    }
+    @media (max-width: 480px) {
+      .contact-form { padding: var(--spacing-4); }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar-container"></div>
+
+  <!-- Hero -->
+  <section class="contact-hero">
+    <div class="container px-global">
+      <h1 data-i18n="contact.title">Hablemos</h1>
+      <p data-i18n="contact.subtitle">¿Tienes dudas o quieres sumarte como negocio local? Escríbenos.</p>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="py-section bg-surface">
+    <div class="container px-global">
+      <div class="contact-layout">
+
+        <!-- Info Side -->
+        <div class="contact-info">
+          <div class="info-card reveal">
+            <div class="info-icon">🏢</div>
+            <div>
+              <h3 data-i18n="contact.office_title">Sede Central</h3>
+              <p>
+                Carrer de la Sostenibilitat, 42<br>
+                07001 Palma, Illes Balears
+              </p>
+            </div>
+          </div>
+
+          <div class="info-card reveal">
+            <div class="info-icon">✉️</div>
+            <div>
+              <h3 data-i18n="contact.email_title">Email</h3>
+              <p><a href="mailto:hola@mallorcaeasystay.eco">hola@mallorcaeasystay.eco</a></p>
+            </div>
+          </div>
+
+          <div class="info-card reveal">
+            <div class="info-icon">📞</div>
+            <div>
+              <h3 data-i18n="contact.phone_title">Teléfono</h3>
+              <p><a href="tel:+34971000000">+34 971 00 00 00</a></p>
+            </div>
+          </div>
+
+          <div class="info-card reveal">
+            <div class="info-icon">🕐</div>
+            <div>
+              <h3 data-i18n="contact.hours_title">Horario</h3>
+              <p data-i18n="contact.hours_detail">Lunes a Viernes: 9:00 – 18:00</p>
+            </div>
+          </div>
+
+          <!-- Mini Map -->
+          <div class="contact-map reveal" id="contact-map"></div>
+
+          <!-- Social -->
+          <div class="reveal">
+            <h3 style="font-family: var(--font-body); font-size: 0.85rem; color: var(--outline-variant); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;" data-i18n="contact.social_title">Síguenos</h3>
+            <div class="social-links">
+              <a href="#" class="social-link" title="Instagram">📷</a>
+              <a href="#" class="social-link" title="Facebook">📘</a>
+              <a href="#" class="social-link" title="Twitter/X">🐦</a>
+              <a href="#" class="social-link" title="LinkedIn">💼</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="contact-form reveal-right">
+          <h2 data-i18n="contact.form_title">Envíanos un Mensaje</h2>
+          <p data-i18n="contact.form_subtitle">Rellena el formulario y te responderemos lo antes posible.</p>
+          
+          <form id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="contact.name" for="name">Nombre completo</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+                <span class="validation-msg" id="name-msg"></span>
+              </div>
+              <div class="form-group">
+                <label data-i18n="contact.email" for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+                <span class="validation-msg" id="email-msg"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label data-i18n="contact.subject" for="subject">Asunto</label>
+              <input type="text" id="subject" name="subject" class="form-control" required>
+              <span class="validation-msg" id="subject-msg"></span>
+            </div>
+
+            <div class="form-group">
+              <label data-i18n="contact.message" for="message">Mensaje</label>
+              <textarea id="message" name="message" class="form-control" required rows="5"></textarea>
+              <span class="validation-msg" id="message-msg"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn">
+              <span class="btn-text" data-i18n="contact.send">Enviar Mensaje</span>
+              <span class="btn-loader">⏳</span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="js/i18n.js"></script>
+  <script type="module" src="js/components.js"></script>
+  <script type="module" src="js/contact.js"></script>
+</body>
+
+</html>

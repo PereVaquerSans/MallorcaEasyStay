@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mapa interactivo de negocios sostenibles en Mallorca. Encuentra artesanos, restaurantes, mercados y experiencias locales.">
+  <title>MallorcaEasyStay | El Mapa Local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    .map-layout {
+      display: flex;
+      height: calc(100vh - 72px);
+      margin-top: 72px;
+    }
+
+    .map-sidebar {
+      width: 400px;
+      background-color: var(--surface);
+      border-right: 1px solid rgba(191, 200, 204, 0.2);
+      display: flex;
+      flex-direction: column;
+      z-index: 500;
+      box-shadow: 4px 0 20px rgba(28, 28, 23, 0.05);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .map-header {
+      padding: 1.25rem var(--spacing-4) 0.75rem;
+      background: var(--surface);
+    }
+
+    .map-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1.5px solid rgba(191, 200, 204, 0.3);
+      background: var(--surface);
+      padding: 0 var(--spacing-4);
+    }
+    .map-tab {
+      flex: 1;
+      padding: 0.7rem 0.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.3s;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .map-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .map-tab:hover {
+      color: var(--primary);
+      background: rgba(0, 70, 85, 0.03);
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    .map-filters {
+      padding: var(--spacing-4);
+      border-bottom: 1px solid rgba(191, 200, 204, 0.2);
+      background: var(--surface-container-low);
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.5rem;
+      border: 1.5px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      background: var(--surface-container-lowest);
+      transition: border-color 0.3s, box-shadow 0.3s;
+      color: var(--on-surface);
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+    }
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .map-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-4);
+    }
+
+    #map-container {
+      flex: 1;
+      height: 100%;
+      z-index: 100;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .filter-group { margin-bottom: 0; }
+    .filter-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .filter-select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-md);
+      font-family: var(--font-body);
+      background-color: var(--surface-container-lowest);
+      color: var(--on-surface);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .list-item {
+      background: var(--surface-container-lowest);
+      padding: 1rem;
+      border-radius: var(--rounded-lg);
+      margin-bottom: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, box-shadow 0.25s;
+      border-left: 3px solid transparent;
+    }
+    .list-item:hover {
+      transform: translateX(4px);
+      background: var(--surface-container-low);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-left-color: var(--primary);
+    }
+
+    /* Nearby Section */
+    .nearby-content {
+      padding: var(--spacing-4);
+      overflow-y: auto;
+      flex: 1;
+    }
+    .nearby-input-group {
+      margin-bottom: 1.25rem;
+    }
+    .nearby-input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin-bottom: 0.4rem;
+    }
+    .radius-slider {
+      width: 100%;
+      accent-color: var(--primary);
+      margin-top: 0.25rem;
+    }
+    .nearby-results {
+      margin-top: 1rem;
+    }
+    .nearby-item {
+      background: var(--surface-container-lowest);
+      padding: 0.75rem 1rem;
+      border-radius: var(--rounded-lg);
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .nearby-item:hover {
+      transform: translateX(4px);
+      background: var(--surface-container-low);
+    }
+    .nearby-dist {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    /* Route Section */
+    .route-content {
+      padding: var(--spacing-4);
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .route-instructions {
+      font-size: 0.9rem;
+      color: var(--on-surface-variant);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .route-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .route-stop {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--surface-container-lowest);
+      border-radius: var(--rounded-lg);
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .route-stop-number {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--on-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .route-stop-remove {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--error);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      transition: transform 0.2s;
+    }
+    .route-stop-remove:hover { transform: scale(1.2); }
+    .route-actions {
+      padding-top: 1rem;
+      border-top: 1px solid rgba(191, 200, 204, 0.2);
+      margin-top: auto;
+    }
+    .route-summary {
+      font-size: 0.85rem;
+      color: var(--on-surface-variant);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Custom Popup Styles */
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--rounded-xl) !important;
+      padding: 0 !important;
+      overflow: hidden;
+      font-family: var(--font-body);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
+      border: 1px solid rgba(191,200,204,0.15);
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      width: 270px !important;
+    }
+    .leaflet-popup-tip {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .popup-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--surface-container) 0%, var(--surface-container-high) 100%);
+      transition: transform 0.4s ease;
+    }
+    .leaflet-popup-content-wrapper:hover .popup-img {
+      transform: scale(1.03);
+    }
+    .popup-body {
+      padding: 1rem 1.1rem 1.1rem;
+    }
+    .popup-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin: 0 0 0.4rem 0;
+      line-height: 1.3;
+    }
+    .popup-desc {
+      font-size: 0.83rem;
+      color: var(--on-surface-variant);
+      margin: 0 0 0.85rem 0;
+      line-height: 1.5;
+    }
+    .popup-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .popup-btn {
+      flex: 1;
+      padding: 0.45rem 0.5rem;
+      border-radius: var(--rounded-md);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+    .popup-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .popup-btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .popup-btn-secondary {
+      background: var(--surface-container);
+      color: var(--primary);
+    }
+
+    /* Mobile toggle */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 600;
+      padding: 0.7rem 1.5rem;
+      background: var(--primary);
+      color: var(--on-primary);
+      border: none;
+      border-radius: var(--rounded-full);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-elevated);
+      transition: all 0.3s;
+    }
+    .sidebar-toggle:hover { background: var(--primary-container); }
+
+    @media (max-width: 768px) {
+      .map-layout {
+        flex-direction: column;
+        position: relative;
+      }
+      .map-sidebar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: 100%;
+        height: 60vh;
+        z-index: 500;
+        border-right: none;
+        border-top: 1px solid rgba(191, 200, 204, 0.3);
+        border-radius: var(--rounded-2xl) var(--rounded-2xl) 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
+        display: flex;
+        flex-direction: column;
+      }
+      .map-sidebar.collapsed {
+        transform: translateY(100%);
+      }
+      .map-sidebar .sidebar-handle {
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: var(--outline-variant);
+        border-radius: var(--rounded-full);
+        margin: 0.75rem auto 0.5rem;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .map-sidebar .map-header { padding: 0.5rem 1.25rem 0.25rem; }
+      .map-sidebar .map-tabs { padding: 0 1rem; }
+      .map-sidebar .tab-content { overflow-y: auto; flex: 1; }
+      .map-sidebar .map-list { max-height: none; overflow-y: auto; }
+      #map-container {
+        height: 100vh;
+        width: 100%;
+      }
+      .sidebar-toggle { display: block; }
+      .filter-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body style="overflow: hidden;">
+  <div id="navbar-container"></div>
+
+  <button class="sidebar-toggle" id="sidebar-toggle" data-i18n="map.toggle_list">📋 Ver Lista</button>
+
+  <div class="map-layout">
+    <aside class="map-sidebar" id="map-sidebar">
+      <div class="sidebar-handle" style="display:none;" id="sidebar-handle"></div>
+
+      <!-- Header -->
+      <div class="map-header">
+        <h2 data-i18n="map.title" style="font-size: 1.4rem; color: var(--primary); margin-bottom: 0.15rem;">El Mapa Local</h2>
+        <p data-i18n="map.subtitle" class="text-sm" style="margin-bottom: 0;">Descubre negocios éticos, artesanos y sabores locales.</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="map-tabs">
+        <button class="map-tab active" data-tab="explore" data-i18n="map.tab_explore">Explorar</button>
+        <button class="map-tab" data-tab="nearby" data-i18n="map.tab_nearby">Cerca de Mí</button>
+        <button class="map-tab" data-tab="route" data-i18n="map.tab_route">Crear Ruta</button>
+      </div>
+
+      <!-- Tab: Explore -->
+      <div class="tab-content active" id="tab-explore">
+        <div class="map-filters">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="Buscar negocios..." data-i18n-placeholder="map.search_placeholder">
+          </div>
+          <div class="filter-row">
+            <div class="filter-group">
+              <label data-i18n="map.zone">Zona</label>
+              <select id="filter-zone" class="filter-select">
+                <option value="" data-i18n="map.all">Todas</option>
+                <option value="tramuntana" data-i18n="map.zone_tramuntana">Serra de Tramuntana</option>
+                <option value="center" data-i18n="map.zone_center">Pla (Centro)</option>
+                <option value="north" data-i18n="map.zone_north">Norte</option>
+                <option value="south" data-i18n="map.zone_south">Sur</option>
+                <option value="east" data-i18n="map.zone_east">Levante</option>
+                <option value="west" data-i18n="map.zone_west">Poniente</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label data-i18n="map.type">Tipo</label>
+              <select id="filter-type" class="filter-select">
+                <option value="" data-i18n="map.all">Todos</option>
+                <option value="artisan" data-i18n="map.type_artisan">Artesanos</option>
+                <option value="restaurant" data-i18n="map.type_restaurant">Restaurantes</option>
+                <option value="market" data-i18n="map.type_market">Mercados</option>
+                <option value="farm" data-i18n="map.type_farm">Fincas</option>
+                <option value="experience" data-i18n="map.type_experience">Experiencias</option>
+                <option value="accommodation" data-i18n="map.type_accommodation">Alojamiento</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="map-list" id="business-list">
+          <p data-i18n="map.loading" style="padding: 1rem; text-align: center;">Cargando mapa...</p>
+        </div>
+      </div>
+
+      <!-- Tab: Nearby -->
+      <div class="tab-content" id="tab-nearby">
+        <div class="nearby-content">
+          <div class="nearby-input-group">
+            <label data-i18n="map.nearby_label">Ubicación</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" id="nearby-location" class="form-control" style="padding: 0.6rem 0.75rem; font-size: 0.9rem;" placeholder="Ej: Palma, Sóller..." data-i18n-placeholder="map.nearby_placeholder">
+              <button class="btn btn-primary" id="btn-geolocate" style="padding: 0.6rem; white-space: nowrap; font-size: 0.8rem;" title="Usar mi ubicación">📍</button>
+            </div>
+          </div>
+          <div class="nearby-input-group">
+            <label data-i18n="map.nearby_radius">Radio: <strong id="radius-value">10</strong> km</label>
+            <input type="range" id="nearby-radius" class="radius-slider" min="1" max="50" value="10">
+          </div>
+          <button class="btn btn-primary" id="btn-nearby-search" style="width: 100%; margin-bottom: 1rem;" data-i18n="map.nearby_search">Buscar Cerca</button>
+          <div class="nearby-results" id="nearby-results"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Route -->
+      <div class="tab-content" id="tab-route">
+        <div class="route-content">
+          <p class="route-instructions" data-i18n="map.route_instructions">Selecciona negocios desde la pestaña "Explorar" o haz clic en "Añadir a Ruta" en los marcadores del mapa para construir tu itinerario.</p>
+          <div class="route-list" id="route-list">
+            <p style="text-align: center; color: var(--on-surface-variant); font-size: 0.9rem; padding: 2rem 0;" data-i18n="map.route_empty">Tu ruta está vacía. ¡Añade lugares para visitar!</p>
+          </div>
+          <div class="route-actions" id="route-actions" style="display: none;">
+            <p class="route-summary" id="route-summary"></p>
+            <button class="btn btn-primary" id="btn-draw-route" style="width: 100%; margin-bottom: 0.5rem;" data-i18n="map.route_draw">Dibujar Ruta en el Mapa</button>
+            <button class="btn btn-secondary" id="btn-clear-route" style="width: 100%;" data-i18n="map.route_clear">Limpiar Ruta</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="map-container"></div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script type="module" src="js/i18n.js"></script>
+  <script type="module" src="js/components.js"></script>
+  <script type="module" src="js/map.js"></script>
+</body>
+
+</html>

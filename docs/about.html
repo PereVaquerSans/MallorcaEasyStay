@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Conoce la historia de MallorcaEasyStay: turismo sostenible, patrimonio cultural y prosperidad local en Mallorca.">
+  <title>MallorcaEasyStay | Sobre Nosotros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* About Hero */
+    .about-hero {
+      position: relative;
+      margin-top: 72px;
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&q=60&w=1280') center/cover no-repeat;
+    }
+    .about-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,70,85,0.7) 0%, rgba(253,249,241,1) 100%);
+    }
+    .about-hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 800px;
+      padding: var(--spacing-20) 1rem var(--spacing-8);
+      animation: fadeInUp 0.8s ease both;
+    }
+    .about-hero-content h1 {
+      color: var(--on-primary);
+      margin-bottom: 1.5rem;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    /* Mission Section */
+    .mission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-12);
+      align-items: center;
+    }
+    .mission-img {
+      width: 100%;
+      border-radius: var(--rounded-xl);
+      box-shadow: var(--shadow-elevated);
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    .chip-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .chip-lg {
+      padding: 0.5rem 1.25rem;
+      background: var(--primary-container);
+      color: var(--on-primary);
+      border-radius: var(--rounded-full);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    /* Values Timeline */
+    .values-section {
+      position: relative;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-6);
+    }
+    .value-card {
+      background: var(--surface-container-lowest);
+      padding: var(--spacing-6);
+      border-radius: var(--rounded-xl);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .value-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-elevated);
+    }
+    .value-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary-container));
+    }
+    .value-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.25rem;
+      background: var(--surface-container-low);
+    }
+
+    /* Stats */
+    .stats-section {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+      color: var(--on-primary);
+      position: relative;
+      overflow: hidden;
+    }
+    .stats-section::before {
+      content: '';
+      position: absolute;
+      bottom: -50%;
+      left: -20%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(200,241,122,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .stat-number {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-family: var(--font-display);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .stat-label {
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+    }
+
+    /* Team Section */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--spacing-6);
+    }
+    .team-card {
+      text-align: center;
+      background: var(--surface-container-lowest);
+      border-radius: var(--rounded-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .team-card:hover {
+      transform: translateY(-4px);
+    }
+    .team-img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+    .team-info {
+      padding: 1.5rem;
+    }
+    .team-info h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+      color: var(--primary);
+    }
+    .team-info p {
+      font-size: 0.9rem;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: var(--surface-container-low);
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .mission-grid { grid-template-columns: 1fr; gap: var(--spacing-6); }
+      .stats-grid { grid-template-columns: 1fr; gap: var(--spacing-6); }
+      .about-hero { min-height: 40vh; }
+      .about-hero-content { padding: var(--spacing-12) 1rem var(--spacing-6); }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar-container"></div>
+
+  <!-- Hero -->
+  <header class="about-hero">
+    <div class="about-hero-overlay"></div>
+    <div class="about-hero-content">
+      <h1 data-i18n="about.title">Nuestra Historia</h1>
+      <div class="heritage-quote" style="padding: 0;">
+        <p data-i18n="about.quote" style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); color: rgba(255,255,255,0.9); text-shadow: 0 1px 8px rgba(0,0,0,0.2);">
+          Preservando el 40% del litoral para la próxima generación, honrando las manos que cultivaron esta tierra.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mission -->
+  <section class="py-section bg-surface">
+    <div class="container px-global">
+      <div class="mission-grid">
+        <div class="reveal-left">
+          <h2 data-i18n="about.mission_title" style="margin-bottom: 1.5rem;">¿Por qué lo hacemos?</h2>
+          <p data-i18n="about.mission_desc" style="font-size: 1.15rem; line-height: 1.8;">
+            MallorcaEasyStay nace como una respuesta a la masificación turística. Queremos redirigir el turismo hacia
+            los pueblos, los artesanos y los pequeños empresarios.
+          </p>
+          <div class="chip-group">
+            <span class="chip-lg" data-i18n="about.chip_local">100% Local</span>
+            <span class="chip-lg" data-i18n="about.chip_fair">Comercio Justo</span>
+            <span class="chip-lg" data-i18n="about.chip_eco">Ecoturismo</span>
+          </div>
+        </div>
+        <div class="reveal-right">
+          <img src="https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&q=70&w=600"
+            alt="Mallorca heritage" class="mission-img" loading="lazy"
+            onerror="this.style.background='linear-gradient(135deg, var(--surface-container), var(--surface-container-high))';this.style.minHeight='300px';">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="py-section bg-container-low values-section">
+    <div class="container px-global">
+      <h2 class="reveal" style="text-align: center; margin-bottom: var(--spacing-12);" data-i18n="about.values_title">Nuestros Valores</h2>
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-icon">🌍</div>
+          <h3 data-i18n="about.value_1_title" style="margin-bottom: 0.75rem;">Sostenibilidad</h3>
+          <p data-i18n="about.value_1_desc">Cada decisión prioriza el bienestar del medio ambiente y las comunidades locales de Mallorca.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🫱🏼‍🫲🏽</div>
+          <h3 data-i18n="about.value_2_title" style="margin-bottom: 0.75rem;">Autenticidad</h3>
+          <p data-i18n="about.value_2_desc">Solo trabajamos con negocios que representan la verdadera esencia cultural de las Baleares.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">💚</div>
+          <h3 data-i18n="about.value_3_title" style="margin-bottom: 0.75rem;">Transparencia</h3>
+          <p data-i18n="about.value_3_desc">Comunicamos abiertamente nuestro impacto, ingresos compartidos y procesos de selección.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">🌱</div>
+          <h3 data-i18n="about.value_4_title" style="margin-bottom: 0.75rem;">Regeneración</h3>
+          <p data-i18n="about.value_4_desc">No solo minimizamos el daño: trabajamos activamente para regenerar ecosistemas y tradiciones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="py-section stats-section">
+    <div class="container px-global">
+      <div class="stats-grid">
+        <div class="reveal">
+          <div class="stat-number" data-count="50">0</div>
+          <p class="stat-label" data-i18n="about.stats_1">Socios Locales</p>
+        </div>
+        <div class="reveal">
+          <div class="stat-number" data-count="15" data-suffix="%">0</div>
+          <p class="stat-label" data-i18n="about.stats_2">De los beneficios a conservación</p>
+        </div>
+        <div class="reveal">
+          <div class="stat-number" data-count="0" data-text="Zero">0</div>
+          <p class="stat-label" data-i18n="about.stats_3">Impacto Carbono Neutro</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="py-section bg-surface">
+    <div class="container px-global">
+      <h2 class="reveal" style="text-align: center; margin-bottom: var(--spacing-12);" data-i18n="about.team_title">El Equipo</h2>
+      <div class="team-grid">
+        <div class="team-card reveal">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" alt="Founder" class="team-img" loading="lazy">
+          <div class="team-info">
+            <h3>Tomeu Barceló</h3>
+            <p data-i18n="about.team_1_role">Fundador & Director</p>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400" alt="Co-founder" class="team-img" loading="lazy">
+          <div class="team-info">
+            <h3>Catalina Vidal</h3>
+            <p data-i18n="about.team_2_role">Co-Fundadora & Sostenibilidad</p>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400" alt="Local partnerships" class="team-img" loading="lazy">
+          <div class="team-info">
+            <h3>Miquel Ferrer</h3>
+            <p data-i18n="about.team_3_role">Alianzas Locales</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-section cta-section">
+    <div class="container px-global reveal" style="max-width: 700px;">
+      <h2 data-i18n="about.cta_title" style="margin-bottom: 1rem;">¿Quieres ser parte del cambio?</h2>
+      <p data-i18n="about.cta_desc" style="margin-bottom: var(--spacing-6);">Únete a nuestra red de socios locales o explora el mapa para descubrir la Mallorca auténtica.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="contact.html" class="btn btn-primary" data-i18n="nav.contact">Contacto</a>
+        <a href="map.html" class="btn btn-secondary" data-i18n="home.hero_cta">Explorar Mapa</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+
+  <script type="module" src="js/i18n.js"></script>
+  <script type="module" src="js/components.js"></script>
+  <script type="module" src="js/about.js"></script>
+</body>
+
+</html>
