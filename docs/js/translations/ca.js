@@ -21,7 +21,7 @@ export default {
     gems_title: "Joies Locals Destacades",
     gems_subtitle: "Aliances curades amb aquells que defineixen l'autèntic esperit mallorquí.",
     testimonial_text: "\"Vam descobrir una Mallorca que no apareix a les guies turístiques. Cada racó tenia una història, cada persona ens va compartir la seva passió per l'illa.\"",
-    map_banner_title: "El Teu Mapa Sostenible t'Espera",
+    map_banner_title: "El teu Mapa Sostenible t'espera",
     map_banner_desc: "Navega per l'illa a través dels ulls dels locals. Filtra per impacte, tradició i camins ocults que respecten la terra.",
     map_banner_cta: "Obrir Mapa Interactiu"
   },
